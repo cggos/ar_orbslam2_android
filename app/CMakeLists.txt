@@ -1,13 +1,9 @@
 # For more information about using CMake with Android Studio, read the
 # documentation: https://d.android.com/studio/projects/add-native-code.html
 
-# Sets the minimum version of CMake required to build the native library.
-
 cmake_minimum_required(VERSION 3.4.1)
 
 SET(CMAKE_BUILD_TYPE Release)
-
-#SET(CMAKE_BUILD_TYPE Debug)
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -15,28 +11,15 @@ CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fopenmp")
 
-find_library( # Sets the name of the path variable.
-              log-lib
-
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
-
-# Specifies libraries CMake should link to your target library. You
-# can link multiple libraries, such as libraries you define in this
-# build script, prebuilt third-party libraries, or system libraries.
-
-
+find_library(log-lib log)
 
 include_directories(
-${PROJECT_SOURCE_DIR}/src/main/cpp
-${PROJECT_SOURCE_DIR}/src/main/cpp/ORB/include
-${PROJECT_SOURCE_DIR}/src/main/cpp/ORB/
-${PROJECT_SOURCE_DIR}/src/main/cpp/Eigen/
-${PROJECT_SOURCE_DIR}/src/main/cpp/Eigen/src
-
+        ${PROJECT_SOURCE_DIR}/src/main/cpp
+        ${PROJECT_SOURCE_DIR}/src/main/cpp/ORB/include
+        ${PROJECT_SOURCE_DIR}/src/main/cpp/ORB/
+        ${PROJECT_SOURCE_DIR}/src/main/cpp/Eigen/
+        ${PROJECT_SOURCE_DIR}/src/main/cpp/Eigen/src
 )
-
 
 ADD_LIBRARY(g2o
         src/main/cpp/ORB/Thirdparty/g2o/g2o/types/types_sba.h
@@ -122,79 +105,64 @@ ADD_LIBRARY(g2o
         src/main/cpp/ORB/Thirdparty/g2o/g2o/stuff/property.h
         )
 ADD_LIBRARY(DBoW2
-src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/BowVector.h
-src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/FORB.h
-src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/FClass.h
-src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/FeatureVector.h
-src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/ScoringObject.h
-src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/TemplatedVocabulary.h
-src/main/cpp/ORB/Thirdparty/DBoW2/DUtils/Random.h
-src/main/cpp/ORB/Thirdparty/DBoW2/DUtils/Timestamp.h
-src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/BowVector.cpp
-src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/FORB.cpp
-src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/FeatureVector.cpp
-src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/ScoringObject.cpp
-src/main/cpp/ORB/Thirdparty/DBoW2/DUtils/Random.cpp
-src/main/cpp/ORB/Thirdparty/DBoW2/DUtils/Timestamp.cpp
-    )
+        src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/BowVector.h
+        src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/FORB.h
+        src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/FClass.h
+        src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/FeatureVector.h
+        src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/ScoringObject.h
+        src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/TemplatedVocabulary.h
+        src/main/cpp/ORB/Thirdparty/DBoW2/DUtils/Random.h
+        src/main/cpp/ORB/Thirdparty/DBoW2/DUtils/Timestamp.h
+        src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/BowVector.cpp
+        src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/FORB.cpp
+        src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/FeatureVector.cpp
+        src/main/cpp/ORB/Thirdparty/DBoW2/DBoW2/ScoringObject.cpp
+        src/main/cpp/ORB/Thirdparty/DBoW2/DUtils/Random.cpp
+        src/main/cpp/ORB/Thirdparty/DBoW2/DUtils/Timestamp.cpp
+        )
 add_library(ORBSLAM2
-    src/main/cpp/ORB/src/System.cc
-    src/main/cpp/ORB/src/Tracking.cc
-    src/main/cpp/ORB/src/LocalMapping.cc
-    src/main/cpp/ORB/src/LoopClosing.cc
-    src/main/cpp/ORB/src/ORBextractor.cc
-    src/main/cpp/ORB/src/ORBmatcher.cc
-    src/main/cpp/ORB/src/FrameDrawer.cc
-    src/main/cpp/ORB/src/Converter.cc
-    src/main/cpp/ORB/src/MapPoint.cc
-    src/main/cpp/ORB/src/KeyFrame.cc
-    src/main/cpp/ORB/src/Map.cc
-    src/main/cpp/ORB/src/Optimizer.cc
-    src/main/cpp/ORB/src/PnPsolver.cc
-    src/main/cpp/ORB/src/Frame.cc
-    src/main/cpp/ORB/src/KeyFrameDatabase.cc
-    src/main/cpp/ORB/src/Sim3Solver.cc
-    src/main/cpp/ORB/src/Initializer.cc
-    #src/main/cpp/ORB/src/Viewer.cc
-)
+        src/main/cpp/ORB/src/System.cc
+        src/main/cpp/ORB/src/Tracking.cc
+        src/main/cpp/ORB/src/LocalMapping.cc
+        src/main/cpp/ORB/src/LoopClosing.cc
+        src/main/cpp/ORB/src/ORBextractor.cc
+        src/main/cpp/ORB/src/ORBmatcher.cc
+        src/main/cpp/ORB/src/FrameDrawer.cc
+        src/main/cpp/ORB/src/Converter.cc
+        src/main/cpp/ORB/src/MapPoint.cc
+        src/main/cpp/ORB/src/KeyFrame.cc
+        src/main/cpp/ORB/src/Map.cc
+        src/main/cpp/ORB/src/Optimizer.cc
+        src/main/cpp/ORB/src/PnPsolver.cc
+        src/main/cpp/ORB/src/Frame.cc
+        src/main/cpp/ORB/src/KeyFrameDatabase.cc
+        src/main/cpp/ORB/src/Sim3Solver.cc
+        src/main/cpp/ORB/src/Initializer.cc
+        #src/main/cpp/ORB/src/Viewer.cc
+        )
 
 add_library(native-lib
-    SHARED
-    src/main/cpp/native-lib.cpp
-    src/main/cpp/Plane.cpp
-    src/main/cpp/Frame.cpp
-    src/main/cpp/Marker.cpp
-    src/main/cpp/Process.cpp
-    src/main/cpp/Camera.cpp
- )
+        SHARED
+        src/main/cpp/native-lib.cpp
+        src/main/cpp/Plane.cpp
+        src/main/cpp/Frame.cpp
+        src/main/cpp/Marker.cpp
+        src/main/cpp/Process.cpp
+        src/main/cpp/Camera.cpp
+        )
 
-target_link_libraries(ORBSLAM2
-                        DBoW2
-                        g2o
-                       ${EIGEN3_LIBS})
+target_link_libraries(ORBSLAM2 DBoW2 g2o ${EIGEN3_LIBS})
 
 # Set the location of the OpenCV 3.2.0 builts
 # (STL type: c++_static, Android ABI: arm64-v8a, release and debug modes)
 # OpenCV 3.2.0 prebuilts for Android with LLVM C++ runtime available for download
 # on: https://github.com/maximaging/opencv-3.2.0-android-prebuilts.git
-set(OpenCV_DIR /home/dev/workspace/repositories/opencv-3.2.0-android-prebuilts.git/opencv-3.2.0-android-25-arm64-v8a/${CMAKE_BUILD_TYPE})
 
 # Retrieve OpenCV_INCLUDE_DIRS and OpenCV_LIBS variables from OpenCVConfig.cmake
 find_package(OpenCV REQUIRED)
-
-message(STATUS "Configured OpenCV include directories: ${OpenCV_INCLUDE_DIRS}")
-
 include_directories(${OpenCV_INCLUDE_DIRS})
 
+message(STATUS "Configured OpenCV include directories: ${OpenCV_INCLUDE_DIRS}")
 message(STATUS "Configured OpenCV libraries: ${OpenCV_LIBS}")
 
-target_link_libraries( # Specifies the target library.
-                       native-lib
-
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib}
-                       ORBSLAM2
-
-                       # Links the target library to opencv static libs
-                       ${OpenCV_LIBS})
+target_link_libraries(native-lib ${log-lib} ORBSLAM2 ${OpenCV_LIBS})

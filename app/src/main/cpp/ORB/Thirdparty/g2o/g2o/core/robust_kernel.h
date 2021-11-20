@@ -30,7 +30,7 @@
 #if (__cplusplus >= 201103L) || (_MSC_VER >= 1600) // C++11
 #include <memory>
 #else
-#include <tr1/memory>
+#include <memory>
 #endif
 #include <Eigen/Core>
 

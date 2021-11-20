@@ -809,13 +809,19 @@ void ORBextractor::ComputeKeyPointsOctTreeEveryLevel(int level, vector<vector<Ke
                 maxX = maxBorderX;
 
             vector<cv::KeyPoint> vKeysCell;
-            FAST(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX),
-                 vKeysCell,iniThFAST,true);
+//            FAST(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX),
+//                 vKeysCell,iniThFAST,true);
+
+            Ptr<FastFeatureDetector> detector = FastFeatureDetector::create(iniThFAST);
+            detector->detect(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX), vKeysCell);
 
             if(vKeysCell.empty())       //如果没有获得特征点，降低阈值再次计算
             {
-                FAST(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX),
-                     vKeysCell,minThFAST,true);
+//                FAST(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX),
+//                     vKeysCell,minThFAST,true);
+
+                detector->setThreshold(minThFAST);
+                detector->detect(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX), vKeysCell);
             }
 
             if(!vKeysCell.empty())
@@ -914,13 +920,19 @@ void ORBextractor::ComputeKeyPointsOctTree(vector<vector<KeyPoint> >& allKeypoin
                     maxX = maxBorderX;
 
                 vector<cv::KeyPoint> vKeysCell;
-                FAST(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX),
-                     vKeysCell,iniThFAST,true);
+//                FAST(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX),
+//                     vKeysCell,iniThFAST,true);
+
+                Ptr<FastFeatureDetector> detector = FastFeatureDetector::create(iniThFAST);
+                detector->detect(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX), vKeysCell);
 
                 if(vKeysCell.empty())       //如果没有获得特征点，降低阈值再次计算
                 {
-                    FAST(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX),
-                         vKeysCell,minThFAST,true);
+//                    FAST(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX),
+//                         vKeysCell,minThFAST,true);
+
+                    detector->setThreshold(minThFAST);
+                    detector->detect(mvImagePyramid[level].rowRange(iniY,maxY).colRange(iniX,maxX), vKeysCell);
                 }
 
                 if(!vKeysCell.empty())
@@ -990,7 +1002,7 @@ void ORBextractor::ComputeKeyPointsOld(std::vector<std::vector<KeyPoint> > &allK
 
         vector<vector<vector<KeyPoint> > > cellKeyPoints(levelRows, vector<vector<KeyPoint> >(levelCols));
 
-        vector<vector<int> > nToRetain(levelRows,vector<int>(levelCols,0));
+        std::vector<std::vector<int> > nToRetain(levelRows,std::vector<int>(levelCols,0));
         vector<vector<int> > nTotal(levelRows,vector<int>(levelCols,0));
         vector<vector<bool> > bNoMore(levelRows,vector<bool>(levelCols,false));
         vector<int> iniXCol(levelCols);
@@ -1042,13 +1054,17 @@ void ORBextractor::ComputeKeyPointsOld(std::vector<std::vector<KeyPoint> > &allK
 
                 cellKeyPoints[i][j].reserve(nfeaturesCell*5);
 
-                FAST(cellImage,cellKeyPoints[i][j],iniThFAST,true);
+//                FAST(cellImage,cellKeyPoints[i][j],iniThFAST,true);
+                Ptr<FastFeatureDetector> detector = FastFeatureDetector::create(iniThFAST);
+                detector->detect(cellImage, cellKeyPoints[i][j]);
 
                 if(cellKeyPoints[i][j].size()<=3)
                 {
                     cellKeyPoints[i][j].clear();
 
-                    FAST(cellImage,cellKeyPoints[i][j],minThFAST,true);
+//                    FAST(cellImage,cellKeyPoints[i][j],minThFAST,true);
+                    detector->setThreshold(minThFAST);
+                    detector->detect(cellImage, cellKeyPoints[i][j]);
                 }
 
 
@@ -1102,7 +1118,7 @@ void ORBextractor::ComputeKeyPointsOld(std::vector<std::vector<KeyPoint> > &allK
             }
         }
 
-        vector<KeyPoint> & keypoints = allKeypoints[level];
+        std::vector<KeyPoint> & keypoints = allKeypoints[level];
         keypoints.reserve(nDesiredFeatures*2);
 
         const int scaledPatchSize = PATCH_SIZE*mvScaleFactor[level];
@@ -1112,7 +1128,7 @@ void ORBextractor::ComputeKeyPointsOld(std::vector<std::vector<KeyPoint> > &allK
         {
             for(int j=0; j<levelCols; j++)
             {
-                vector<KeyPoint> &keysCell = cellKeyPoints[i][j];
+                std::vector<KeyPoint> &keysCell = cellKeyPoints[i][j];
                 KeyPointsFilter::retainBest(keysCell,nToRetain[i][j]);
                 if((int)keysCell.size()>nToRetain[i][j])
                     keysCell.resize(nToRetain[i][j]);

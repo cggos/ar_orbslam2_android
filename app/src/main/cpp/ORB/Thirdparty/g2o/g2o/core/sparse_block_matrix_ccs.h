@@ -37,7 +37,7 @@
 #if (__cplusplus >= 201103L) || (_MSC_VER >= 1600) // C++11
 #include <unordered_map>
 #else
-#include <tr1/unordered_map>
+#include <unordered_map>
 #endif
 
 namespace g2o {
