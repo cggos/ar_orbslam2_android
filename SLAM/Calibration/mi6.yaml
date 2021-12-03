@@ -5,10 +5,10 @@
 #--------------------------------------------------------------------------------------------
 
 # Camera calibration and distortion parameters (OpenCV) 
-Camera.fx: 752.277145
-Camera.fy: 752.277145
-Camera.cx: 403.000000
-Camera.cy: 301.500000
+Camera.fx: 482.9867
+Camera.fy: 482.9515
+Camera.cx: 326.0755
+Camera.cy: 239.631
 
 Camera.k1: 0.000000
 Camera.k2: 0.000000
@@ -48,7 +48,7 @@ ORBextractor.minThFAST: 7
 Viewer.KeyFrameSize: 0.05
 Viewer.KeyFrameLineWidth: 1
 Viewer.GraphLineWidth: 0.9
-Viewer.PointSize:2
+Viewer.PointSize: 2
 Viewer.CameraSize: 0.08
 Viewer.CameraLineWidth: 3
 Viewer.ViewpointX: 0
