@@ -45,16 +45,6 @@ void txt_2_bin(){
     save_as_binary(voc, "/storage/emulated/0/SLAM/VOC/ORBvoc.bin");
 }
 
-cv::Point2f Camera2Pixel(cv::Mat poseCamera,cv::Mat mk){
-    return Point2f(
-            poseCamera.at<float>(0,0)/poseCamera.at<float>(2,0)*mk.at<float>(0,0)+mk.at<float>(0,2),
-            poseCamera.at<float>(1,0)/poseCamera.at<float>(2,0)*mk.at<float>(1,1)+mk.at<float>(1,2)
-    );
-}
-
-
-
-
 extern "C"
 JNIEXPORT jfloatArray JNICALL
 Java_com_example_ys_orbtest_OrbTest_CVTest(JNIEnv *env, jobject instance, jlong matAddr) {
@@ -125,33 +115,19 @@ Java_com_example_ys_orbtest_OrbTest_CVTest(JNIEnv *env, jobject instance, jlong 
 //            cv::line(*pMat, markerPoints[0],markerPoints[3], cv::Scalar(0, 0, 250), 5);
 //        }
 
-
-
-
         cv::Mat rVec;
         cv::Rodrigues(pose.colRange(0, 3).rowRange(0, 3), rVec);
         cv::Mat tVec = pose.col(3).rowRange(0, 3);
 
-        const vector<ORB_SLAM2::MapPoint*> vpMPs = SLAM->mpTracker->mpMap->GetAllMapPoints();//所有的地图点
+        const vector<ORB_SLAM2::MapPoint*> vpMPs  = SLAM->mpTracker->mpMap->GetAllMapPoints();//所有的地图点
         const vector<ORB_SLAM2::MapPoint*> vpTMPs = SLAM->GetTrackedMapPoints();
-        vector<cv::KeyPoint> vKPs = SLAM->GetTrackedKeyPointsUn();
-//        for(int i=0; i<vKPs.size(); i++)
-//        {
-//            if(vpTMPs[i])
-//            {
-//                cv::circle(*pMat, vKPs[i].pt, 2, cv::Scalar(0, 255, 0), 1, 8);
-//            }
-//        }
-//        if(vpTMPs.size() > 0){
-//
-//        }
+//        vector<cv::KeyPoint> vKPs = SLAM->GetTrackedKeyPointsUn();
         if (vpMPs.size() > 0) {
             std::vector<cv::Point3f> allmappoints;
             for (size_t i = 0; i < vpMPs.size(); i++) {
                 if (vpMPs[i]) {
                     cv::Point3f pos = cv::Point3f(vpMPs[i]->GetWorldPos());
                     allmappoints.push_back(pos);
-//                  LOGE("Point's world pose is %f %f %f",pos.x,pos.y,pos.z );
                 }
             }
             LOGI("all map points size %d", allmappoints.size());
@@ -163,100 +139,65 @@ Java_com_example_ys_orbtest_OrbTest_CVTest(JNIEnv *env, jobject instance, jlong 
                     cv::circle(*pMat, cv::Point(r1.x, r1.y), 2, cv::Scalar(0, 255, 0), 1, 8);
             }
 
-            if(instialized == false){
+            if(instialized == false) {
                 Plane mplane;
                 cv::Mat tempTpw,rpw,rwp,tpw,twp;
                 LOGE("Detect  Plane");
                 tempTpw = mplane.DetectPlane(pose,vpTMPs,50);
-                if(!tempTpw.empty()){
+                if(!tempTpw.empty()) {
                     LOGE("Find  Plane");
+
                     rpw = tempTpw.rowRange(0,3).colRange(0,3);
-                    for(int row = 0 ; row < 4;row++){
-                        LOGE(" tempTpw %f %f %f %f",tempTpw.at<float>(row,0),tempTpw.at<float>(row,1),tempTpw.at<float>(row,2),tempTpw.at<float>(row,3));
-                    }
                     tpw = tempTpw.col(3).rowRange(0,3);
+
                     rwp = rpw.t();
                     twp = -rwp*tpw;
+
                     rwp.copyTo(Plane2World.rowRange(0,3).colRange(0,3));
-                    for(int row = 0 ; row < 3;row++){
-                        LOGE(" rwp %f %f %f",rwp.at<float>(row,0),rwp.at<float>(row,1),rwp.at<float>(row,2));
-                    }
                     twp.copyTo(Plane2World.col(3).rowRange(0,3));
-                    for(int row = 0 ; row < 4;row++){
-                        LOGE(" Plane2World %f %f %f %f",Plane2World.at<float>(row,0),Plane2World.at<float>(row,1),Plane2World.at<float>(row,2),Plane2World.at<float>(row,3));
-                    }
+
                     centroid = mplane.o;
                     LOGE("Centroid is %f %f %f",mplane.o.at<float>(0,0),mplane.o.at<float>(1,0),mplane.o.at<float>(2,0));
+
                     instialized = true;
+
                     LOGE("Find  Plane");
-                    Plane2World =tempTpw;
+                    Plane2World =tempTpw; // ???
                 }
 
-            }else{
+            } else {
                 cv::Mat Plane2Camera = pose*Plane2World;
-//                vector<cv::Mat> axisPoints(4);
-//                axisPoints[0] = (cv::Mat_ <float>(4,1)<<0,0,0,1);
-//                axisPoints[1] = (cv::Mat_ <float>(4,1)<<0.3,0,0,1);
-//                axisPoints[2] = (cv::Mat_ <float>(4,1)<<0,0.3,0,1);
-//                axisPoints[3] = (cv::Mat_ <float>(4,1)<<0,0,0.3,1);
-//                vector<cv::Point2f> drawPoints(4);
-//                for(int i = 0 ; i < 4; i++){
-//                    axisPoints[i] = Plane2Camera*axisPoints[i];
-//
-//                    drawPoints[i] = Camera2Pixel(axisPoints[i],SLAM->mpTracker->mK);
-//                    LOGE("drawPoints x y %f %f",drawPoints[i].x,drawPoints[i].y);
-//                }
-//                LOGE("axisPoints x y %f %f %f",axisPoints[0].at<float>(0,0),axisPoints[0].at<float>(1,0),axisPoints[0].at<float>(2,0));
-//                cv::line(*pMat, drawPoints[0],drawPoints[1], cv::Scalar(250, 0, 0), 5);
-//                cv::line(*pMat, drawPoints[0],drawPoints[2], cv::Scalar(0, 250, 0), 5);
-//                cv::line(*pMat, drawPoints[0],drawPoints[3], cv::Scalar(0, 0, 250), 5);
 
                 vector<cv::Point3f> drawPoints(8);
-                drawPoints[0] = cv::Point3f(0,0,0);
-                drawPoints[1] = cv::Point3f(0.3,0.0,0.0);
-                drawPoints[2] = cv::Point3f(0.0,0,0.3);
-                drawPoints[3] = cv::Point3f(0.0,0.3,0);
-                drawPoints[4] =cv::Point3f(0,0.3,0.3);
-                drawPoints[5] =cv::Point3f(0.3,0.3,0.3);
-                drawPoints[6] =cv::Point3f(0.3,0,0.3);
-                drawPoints[7] =cv::Point3f(0.3,0.3,0);
+                drawPoints[0] = cv::Point3f(0.0,0.0,0.0);
+                drawPoints[1] = cv::Point3f(0.3,0.0,0.0); // x
+                drawPoints[2] = cv::Point3f(0.0,0.0,0.3); // z
+                drawPoints[3] = cv::Point3f(0.0,0.3,0.0); // y
+                drawPoints[4] = cv::Point3f(0.0,0.3,0.3);
+                drawPoints[5] = cv::Point3f(0.3,0.3,0.3);
+                drawPoints[6] = cv::Point3f(0.3,0.0,0.3);
+                drawPoints[7] = cv::Point3f(0.3,0.3,0.0);
 
-
-
-//                for(int i = 0 ; i < 4 ;i ++){
-//                    drawPoints[i].x += centroid.at<float>(0,0);
-//                    drawPoints[i].y += centroid.at<float>(1,0);
-//                    drawPoints[i].z += centroid.at<float>(2,0);
-//                }
-
-                for(int row = 0 ; row < 4;row++){
-                    LOGE(" Plane2Camera %f %f %f %f",Plane2Camera.at<float>(row,0),Plane2Camera.at<float>(row,1),Plane2Camera.at<float>(row,2),Plane2Camera.at<float>(row,3));
-                }
                 cv::Mat Rcp ,Tcp;
                 cv::Rodrigues(Plane2Camera.rowRange(0,3).colRange(0,3),Rcp);
-                LOGE(" rwp %f %f %f",Rcp.at<float>(0,0),Rcp.at<float>(1,0),Rcp.at<float>(2,2));
-
                 Tcp = Plane2Camera.col(3).rowRange(0,3);
-                LOGE("Tcp %f %f %f",Tcp.at<float>(0,0),Tcp.at<float>(1,0),Tcp.at<float>(2,0));
-//                cv::Rodrigues(pose.rowRange(0,3).colRange(0,3),Rcp);
-//                Tcp = pose.col(3).rowRange(0,3);
+
                 cv::projectPoints(drawPoints, Rcp, Tcp, SLAM->mpTracker->mK, SLAM->mpTracker->mDistCoef, projectedPoints);
 
-//                cv::line(*pMat, projectedPoints[0],projectedPoints[1], cv::Scalar(250, 0, 0), 5); //画X轴 红色
-//                cv::line(*pMat, projectedPoints[0],projectedPoints[2], cv::Scalar(0, 250, 0), 5);//画Z轴  绿色
-//                cv::line(*pMat, projectedPoints[0],projectedPoints[3], cv::Scalar(0, 0, 250), 5);//画Y轴 蓝色
-//                cv::line(*pMat, projectedPoints[1],projectedPoints[7], cv::Scalar(10, 0, 50), 2);
-//                cv::line(*pMat, projectedPoints[3],projectedPoints[7], cv::Scalar(20, 0, 50),2);
-//                cv::line(*pMat, projectedPoints[3],projectedPoints[4], cv::Scalar(30, 0, 50),2 );
-//                cv::line(*pMat, projectedPoints[2],projectedPoints[4], cv::Scalar(40, 0, 50),2);
-//                cv::line(*pMat, projectedPoints[1],projectedPoints[6], cv::Scalar(50, 0, 50), 2);
-//                cv::line(*pMat, projectedPoints[2],projectedPoints[6], cv::Scalar(60, 0, 50), 2);
-//                cv::line(*pMat, projectedPoints[4],projectedPoints[5], cv::Scalar(70, 0, 50), 2);
-//                cv::line(*pMat, projectedPoints[5],projectedPoints[6], cv::Scalar(80, 0, 50), 2);
-//                cv::line(*pMat, projectedPoints[5],projectedPoints[7], cv::Scalar(90, 0, 50), 2);
+                cv::line(*pMat, projectedPoints[0],projectedPoints[1], cv::Scalar(250, 0, 0), 5); // 画X轴 红色
+                cv::line(*pMat, projectedPoints[0],projectedPoints[2], cv::Scalar(0, 0, 250), 5); // 画Z轴 蓝色
+                cv::line(*pMat, projectedPoints[0],projectedPoints[3], cv::Scalar(0, 250, 0), 5); // 画Y轴 绿色
+                cv::line(*pMat, projectedPoints[1],projectedPoints[7], cv::Scalar(10, 0, 50), 2);
+                cv::line(*pMat, projectedPoints[3],projectedPoints[7], cv::Scalar(20, 0, 50),2);
+                cv::line(*pMat, projectedPoints[3],projectedPoints[4], cv::Scalar(30, 0, 50),2 );
+                cv::line(*pMat, projectedPoints[2],projectedPoints[4], cv::Scalar(40, 0, 50),2);
+                cv::line(*pMat, projectedPoints[1],projectedPoints[6], cv::Scalar(50, 0, 50), 2);
+                cv::line(*pMat, projectedPoints[2],projectedPoints[6], cv::Scalar(60, 0, 50), 2);
+                cv::line(*pMat, projectedPoints[4],projectedPoints[5], cv::Scalar(70, 0, 50), 2);
+                cv::line(*pMat, projectedPoints[5],projectedPoints[6], cv::Scalar(80, 0, 50), 2);
+                cv::line(*pMat, projectedPoints[5],projectedPoints[7], cv::Scalar(90, 0, 50), 2);
 
-//                cv::circle(*pMat, projectedPoints[0], 2, cv::Scalar(0, 0, 250), 1, 8);
-
+                cv::circle(*pMat, projectedPoints[0], 2, cv::Scalar(0, 0, 250), 1, 8);
             }
 
         }
